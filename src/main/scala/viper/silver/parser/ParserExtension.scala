@@ -7,6 +7,7 @@
 package viper.silver.parser
 
 import viper.silver.plugin._
+
 import scala.collection.Set
 
 object ParserExtension extends ParserPluginTemplate {
@@ -24,6 +25,9 @@ object ParserExtension extends ParserPluginTemplate {
 
   private var _newExpAtEnd: Option[Extension[PExp]] = None
   private var _newExpAtStart: Option[Extension[PExp]] = None
+
+  private var _newSuffixedExpAtEnd: Option[Extension[SuffixedExpressionGenerator[PExp]]] = None
+  private var _newSuffixedExpAtStart: Option[Extension[SuffixedExpressionGenerator[PExp]]] = None
 
   private var _newStmtAtEnd: Option[Extension[PStmt]] = None
   private var _newStmtAtStart: Option[Extension[PStmt]] = None
@@ -69,6 +73,16 @@ object ParserExtension extends ParserPluginTemplate {
     case Some(ext) => ext
   }
 
+  override def newSuffixedExpAtEnd : Extension[SuffixedExpressionGenerator[PExp]] = _newSuffixedExpAtEnd match {
+    case None => ParserPluginTemplate.defaultSuffixedExpExtension
+    case Some(ext) => ext
+  }
+
+  override def newSuffixedExpAtStart : Extension[SuffixedExpressionGenerator[PExp]] = _newSuffixedExpAtStart match {
+    case None => ParserPluginTemplate.defaultSuffixedExpExtension
+    case Some(ext) => ext
+  }
+
   override def postSpecification : Extension[PExp] = _postSpecification match {
     case None => ParserPluginTemplate.defaultExpExtension
     case Some(ext) => ext
@@ -104,6 +118,16 @@ object ParserExtension extends ParserPluginTemplate {
   def addNewExpAtStart(t: Extension[PExp]) : Unit = _newExpAtStart match {
     case None => _newExpAtStart = Some(t)
     case Some(s) => _newExpAtStart = Some(combine(s, t))
+  }
+
+  def addNewSuffixedExpAtEnd(t: Extension[SuffixedExpressionGenerator[PExp]]) : Unit = _newSuffixedExpAtEnd match {
+    case None => _newSuffixedExpAtEnd = Some(t)
+    case Some(s) => _newSuffixedExpAtEnd = Some(combine(s, t))
+  }
+
+  def addNewSuffixedExpAtStart(t: Extension[SuffixedExpressionGenerator[PExp]]) : Unit = _newSuffixedExpAtStart match {
+    case None => _newSuffixedExpAtStart = Some(t)
+    case Some(s) => _newSuffixedExpAtStart = Some(combine(s, t))
   }
 
   def addNewStmtAtEnd(t: Extension[PStmt]) : Unit = _newStmtAtEnd match {

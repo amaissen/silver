@@ -6,15 +6,13 @@
 
 package viper.silver.plugin
 
-import viper.silver.parser.{NameAnalyser, PExp, PExtender, PStmt, PTypeSubstitution, Translator, TypeChecker}
+import fastparse._
 import viper.silver.ast.pretty.PrettyPrintPrimitives
-import viper.silver.ast.{Declaration, ErrorTrafo, Exp, ExtensionExp, ExtensionMember, ExtensionStmt, Info, Member, Node, Position, Stmt, Type}
+import viper.silver.ast._
+import viper.silver.parser._
 import viper.silver.verifier.VerificationResult
-import viper.silver.ast.{Position, NoPosition}
 
 import scala.collection.Set
-
-import fastparse._
 
 trait ParserPluginTemplate {
   import ParserPluginTemplate.Extension
@@ -60,11 +58,24 @@ trait ParserPluginTemplate {
     */
   def newExpAtEnd : Extension[PExp] = ParserPluginTemplate.defaultExpExtension
 
-/**
+ /**
   * The newExp rule provides an extension to the expression parsers.
   * This provides an extension to expressions that can be used force the parser to parse certain rules with high priority
   */
   def newExpAtStart : Extension[PExp] = ParserPluginTemplate.defaultExpExtension
+
+  /**
+    * The newSuffixedExp rule provides an extension to the suffixed expression parsers.
+    * The suffixed expressions at the End Position are conservative extensions to the grammar. Extending the suffixed expressions
+    * using this parser will not cause any effects in the pre existing parser and any other viper codes.
+    */
+  def newSuffixedExpAtEnd : Extension[SuffixedExpressionGenerator[PExp]] = ParserPluginTemplate.defaultSuffixedExpExtension
+
+  /**
+    * The newSuffixedExp rule provides an extension to the suffixed expression parsers.
+    * This provides an extension to suffixed expressions that can be used force the parser to parse certain rules with high priority
+    */
+  def newSuffixedExpAtStart : Extension[SuffixedExpressionGenerator[PExp]] = ParserPluginTemplate.defaultSuffixedExpExtension
 
   /**
     * The specification rule provides an extension to the precondition expressions
@@ -177,4 +188,5 @@ object ParserPluginTemplate {
   def defaultExtension : Extension[PExtender] = Fail(_)
   def defaultStmtExtension : Extension[PStmt] = Fail(_)
   def defaultExpExtension : Extension[PExp] = Fail(_)
+  def defaultSuffixedExpExtension: Extension[SuffixedExpressionGenerator[PExp]] = Fail(_)
 }
